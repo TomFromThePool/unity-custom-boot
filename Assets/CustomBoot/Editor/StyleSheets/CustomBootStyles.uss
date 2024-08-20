@@ -1,0 +1,9 @@
+.settings {
+    padding: 12px;
+}
+
+.title {
+    font-size: 180%;
+    -unity-font-style: bold;
+    margin-bottom: 10px;
+}

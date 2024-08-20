@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b4618adec17468d8064d6088ef8e38b, type: 3}
+  m_Name: CustomBootSettings_Runtime
+  m_EditorClassIdentifier: 
+  BootPrefabs:
+  - {fileID: 3829016761048117618, guid: 43d55e79e1fd6604a9b869743cf2b119, type: 3}
+  - {fileID: 9058496997239287515, guid: 0af7e56ab22207f4d969e5370b9c426b, type: 3}
+  - {fileID: 3987099828561243496, guid: 0c3fe79f4f51df648b7b04c1c0c079e9, type: 3}
