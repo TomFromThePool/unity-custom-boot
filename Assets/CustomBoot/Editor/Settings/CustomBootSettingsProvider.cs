@@ -123,13 +123,8 @@ namespace HalliHax.CustomBoot.Editor
                 CustomBootSettingsUtil.GetOrCreateSettings();
             }
             
-            if (CustomBootSettingsUtil.IsSettingsAvailable())
-            {
-                var provider = new CustomBootSettingsProvider("Project/Custom Boot", SettingsScope.Project);
-                return provider;
-            }
-
-            return null;
+            var provider = new CustomBootSettingsProvider("Project/Custom Boot", SettingsScope.Project);
+            return provider;
         }
     }
 }

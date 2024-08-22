@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BootPrefabs:
   - {fileID: 3829016761048117618, guid: 43d55e79e1fd6604a9b869743cf2b119, type: 3}
-  - {fileID: 9058496997239287515, guid: 0af7e56ab22207f4d969e5370b9c426b, type: 3}
   - {fileID: 3987099828561243496, guid: 0c3fe79f4f51df648b7b04c1c0c079e9, type: 3}
+  - {fileID: 9058496997239287515, guid: 0af7e56ab22207f4d969e5370b9c426b, type: 3}

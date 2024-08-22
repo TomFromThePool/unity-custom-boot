@@ -4,7 +4,7 @@ using UnityEngine.AddressableAssets;
 namespace HalliHax.CustomBoot.Editor
 {
     /// <summary>
-    /// A scriptable object used to store CustomBoot settings for both Runtime and Editor.
+    /// A scriptable object used to store references to CustomBoot settings for both Runtime and Editor.
     /// </summary>
     public class CustomBootProjectSettings : ScriptableObject
     {

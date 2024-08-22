@@ -19,16 +19,18 @@ namespace HalliHax.CustomBoot.Editor
         /// Path to the ProjectSettings file
         /// </summary>
         private const string PROJECT_SETTINGS_PATH = "ProjectSettings/CustomBoot.asset";
-        
+
         /// <summary>
         /// Path to the runtime custom boot settings file
         /// </summary>
-        private const string RUNTIME_CUSTOM_BOOT_SETTINGS_PATH = "Assets/CustomBoot/Settings/Runtime/CustomBootSettings_Runtime.asset";
-        
+        private const string RUNTIME_CUSTOM_BOOT_SETTINGS_PATH =
+            "Assets/CustomBoot/Settings/Runtime/CustomBootSettings_Runtime.asset";
+
         /// <summary>
         /// Path to the editor custom boot settings file
         /// </summary>
-        private const string EDITOR_CUSTOM_BOOT_SETTINGS_PATH = "Assets/CustomBoot/Settings/Editor/CustomBootSettings_Editor.asset";
+        private const string EDITOR_CUSTOM_BOOT_SETTINGS_PATH =
+            "Assets/CustomBoot/Settings/Editor/CustomBootSettings_Editor.asset";
 
         /// <summary>
         /// Determine whether the settings asset file is available
@@ -36,10 +38,10 @@ namespace HalliHax.CustomBoot.Editor
         /// <returns></returns>
         internal static bool IsSettingsAvailable()
         {
-            return File.Exists(CustomBootSettingsUtil.PROJECT_SETTINGS_PATH);
+            return File.Exists(PROJECT_SETTINGS_PATH);
         }
 
-       
+
         /// <summary>
         /// Retrieve the settings object if it exists, otherwise create and return it.
         /// </summary>
@@ -47,20 +49,30 @@ namespace HalliHax.CustomBoot.Editor
         internal static CustomBootProjectSettings GetOrCreateSettings()
         {
             CustomBootProjectSettings projectSettings;
-            if (!IsSettingsAvailable())
-            {
-                projectSettings = ScriptableObject.CreateInstance<CustomBootProjectSettings>();
 
-                CreateBootSettingsAssets(out var runtimeEntry, out var editorEntry);
-                projectSettings.RuntimeSettings = new AssetReference(runtimeEntry.guid);
-                projectSettings.EditorSettings = new AssetReference(editorEntry.guid);
-                InternalEditorUtility.SaveToSerializedFileAndForget(new Object[] {projectSettings}, PROJECT_SETTINGS_PATH, true);
+            //Check whether the settings file already exists
+            if (IsSettingsAvailable())
+            {
+                //If it exists, load it
+                projectSettings = InternalEditorUtility.LoadSerializedFileAndForget(PROJECT_SETTINGS_PATH).First() as
+                    CustomBootProjectSettings;
             }
             else
             {
-                projectSettings = InternalEditorUtility.LoadSerializedFileAndForget(PROJECT_SETTINGS_PATH).First() as CustomBootProjectSettings;
+                //If it doesn't exist, create a new ScriptableObject
+                projectSettings = ScriptableObject.CreateInstance<CustomBootProjectSettings>();
+
+                //Configure the settings file
+                CreateBootSettingsAssets(out var runtimeEntry, out var editorEntry);
+                projectSettings.RuntimeSettings = new AssetReference(runtimeEntry.guid);
+                projectSettings.EditorSettings = new AssetReference(editorEntry.guid);
+
+                //And save it!
+                InternalEditorUtility.SaveToSerializedFileAndForget(new Object[] { projectSettings },
+                    PROJECT_SETTINGS_PATH, true);
             }
 
+            //Finally, return our settings object
             return projectSettings;
         }
 
@@ -69,17 +81,22 @@ namespace HalliHax.CustomBoot.Editor
         /// </summary>
         /// <param name="runtimeEntry"></param>
         /// <param name="editorEntry"></param>
-        private static void CreateBootSettingsAssets(out AddressableAssetEntry runtimeEntry, out AddressableAssetEntry editorEntry)
+        private static void CreateBootSettingsAssets(out AddressableAssetEntry runtimeEntry,
+            out AddressableAssetEntry editorEntry)
         {
-            var runtimeSettings = GetOrCreateBootSettingsAsset(RUNTIME_CUSTOM_BOOT_SETTINGS_PATH, out var runtimeCreated);
+            //Create two assets representing our boot configurations
+            var runtimeSettings =
+                GetOrCreateBootSettingsAsset(RUNTIME_CUSTOM_BOOT_SETTINGS_PATH, out var runtimeCreated);
             var editorSettings = GetOrCreateBootSettingsAsset(EDITOR_CUSTOM_BOOT_SETTINGS_PATH, out var editorCreated);
 
+            //Save the AssetDatabase state if either asset is new
             if (runtimeCreated || editorCreated)
             {
                 AssetDatabase.SaveAssets();
             }
-            
-            AddSettingsToDefaultAddressables(runtimeSettings, editorSettings, out runtimeEntry, out editorEntry);
+
+            //Configure the Addressables system with the new assets.
+            AddSettingsToAddressables(runtimeSettings, editorSettings, out runtimeEntry, out editorEntry);
         }
 
         /// <summary>
@@ -109,19 +126,26 @@ namespace HalliHax.CustomBoot.Editor
             {
                 wasCreated = false;
             }
-            
+
             return settings;
         }
 
         /// <summary>
-        /// Add the CustomBootSettings asset to the Default Addressables group.
+        /// Add the CustomBootSettings asset to the relevant Addressables groups.
         /// </summary>
         /// <param name="runtimeSettings"></param>
-        private static void AddSettingsToDefaultAddressables(CustomBootSettings runtimeSettings, CustomBootSettings editorSettings, out AddressableAssetEntry runtimeEntry, out AddressableAssetEntry editorEntry)
+        /// <param name="editorSettings"></param>
+        /// <param name="runtimeEntry"></param>
+        /// <param name="editorEntry"></param>
+        private static void AddSettingsToAddressables(CustomBootSettings runtimeSettings,
+            CustomBootSettings editorSettings, out AddressableAssetEntry runtimeEntry,
+            out AddressableAssetEntry editorEntry)
         {
             InitialiseAddressableGroups(out var runtimeGroup, out var editorGroup);
-            runtimeEntry = CreateCustomBootSettingsEntry(runtimeSettings, runtimeGroup,$"{nameof(CustomBootSettings)}_Runtime");
-            editorEntry = CreateCustomBootSettingsEntry(editorSettings, editorGroup, $"{nameof(CustomBootSettings)}_Editor");
+            runtimeEntry =
+                CreateCustomBootSettingsEntry(runtimeSettings, runtimeGroup, $"{nameof(CustomBootSettings)}_Runtime");
+            editorEntry =
+                CreateCustomBootSettingsEntry(editorSettings, editorGroup, $"{nameof(CustomBootSettings)}_Editor");
             AssetDatabase.SaveAssets();
         }
 
@@ -132,14 +156,28 @@ namespace HalliHax.CustomBoot.Editor
         /// <param name="group"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        private static AddressableAssetEntry CreateCustomBootSettingsEntry(CustomBootSettings bootSettings, AddressableAssetGroup group, string key)
+        private static AddressableAssetEntry CreateCustomBootSettingsEntry(CustomBootSettings bootSettings,
+            AddressableAssetGroup group, string key)
         {
             var settings = AddressableAssetSettingsDefaultObject.Settings;
-            var entry = settings.CreateOrMoveEntry(AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(bootSettings)),
-                    group);
+            var entry = settings.CreateOrMoveEntry(
+                AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(bootSettings)),
+                group);
             entry.address = key;
             settings.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, entry, true);
             return entry;
+        }
+
+        /// <summary>
+        /// Ensure the Runtime and Editor Addressables groups exist
+        /// </summary>
+        /// <param name="runtimeGroup"></param>
+        /// <param name="editorGroup"></param>
+        private static void InitialiseAddressableGroups(out AddressableAssetGroup runtimeGroup,
+            out AddressableAssetGroup editorGroup)
+        {
+            runtimeGroup = GetOrCreateGroup($"{nameof(CustomBoot)}_Runtime", true);
+            editorGroup = GetOrCreateGroup($"{nameof(CustomBoot)}_Editor", false);
         }
 
         /// <summary>
@@ -159,17 +197,6 @@ namespace HalliHax.CustomBoot.Editor
             }
 
             return group;
-        }
-
-        /// <summary>
-        /// Ensure the Runtime and Editor Addressables groups exist
-        /// </summary>
-        /// <param name="runtimeGroup"></param>
-        /// <param name="editorGroup"></param>
-        private static void InitialiseAddressableGroups(out AddressableAssetGroup runtimeGroup, out AddressableAssetGroup editorGroup)
-        {
-            runtimeGroup = GetOrCreateGroup($"{nameof(CustomBoot)}_Runtime", true);
-            editorGroup = GetOrCreateGroup($"{nameof(CustomBoot)}_Editor", false);
         }
 
         /// <summary>

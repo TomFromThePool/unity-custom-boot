@@ -15,7 +15,7 @@ namespace HalliHax.Samples
         public InputActionReference Right;
         public InputActionReference Look;
 
-        private void OnEnable()
+        private void Awake()
         {
             Forward.action.Enable();
             Forward.action.started += ForwardStarted;
