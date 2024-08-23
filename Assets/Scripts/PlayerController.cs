@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace HalliHax.Samples
 {
@@ -34,6 +35,19 @@ namespace HalliHax.Samples
             Right.action.canceled += RightCanceled;
             Look.action.Enable();
             currentRotationEuler = CameraPivot.rotation.eulerAngles;
+            
+            
+            SceneManager.sceneLoaded += SceneManagerOnsceneLoaded;
+        }
+
+        /// <summary>
+        /// Reset position to 0,0,0 when scene changes. In a real game, we'd have a spawn manager to handle this
+        /// </summary>
+        /// <param name="arg0"></param>
+        /// <param name="arg1"></param>
+        private void SceneManagerOnsceneLoaded(Scene arg0, LoadSceneMode arg1)
+        {
+            transform.position = Vector3.zero;
         }
 
         private void RightCanceled(InputAction.CallbackContext obj)
