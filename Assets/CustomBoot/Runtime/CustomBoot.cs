@@ -14,7 +14,7 @@ namespace HalliHax.CustomBoot
         /// Current initialisation status
         /// </summary>
         public static bool Initialised { get; private set; }
-        
+
         /// <summary>
         // Called as soon as the game begins
         /// </summary>
@@ -24,6 +24,14 @@ namespace HalliHax.CustomBoot
             //We should always clean up after Addressables, so let's take care of that immediately
             Application.quitting += ApplicationOnUnloading;
 
+            PerformInitialisation();
+        }
+
+        /// <summary>
+        /// Initialise the bootstrapper
+        /// </summary>
+        public static void PerformInitialisation()
+        {
             //In editor, perform initialisation synchronously
             if (Application.isEditor)
             {
@@ -35,19 +43,27 @@ namespace HalliHax.CustomBoot
                 _ = InitialiseBootSettings();
             }
         }
-        
- 
+
+
         /// <summary>
         /// Called as the game is quitting, allowing for cleanup
         /// </summary>
         private static void ApplicationOnUnloading()
         {
             Application.quitting -= ApplicationOnUnloading;
+            PerformDeInitialisation();
+        }
+
+        /// <summary>
+        /// De-Initialise the bootstrapper
+        /// </summary>
+        public static void PerformDeInitialisation()
+        {
             Cleanup(runtimeBootSettingsHandle);
             Cleanup(editorBootSettingsHandle);
             Initialised = false;
         }
- 
+
 
         /// <summary>
         /// Initialise the boot settings asynchronously
@@ -66,7 +82,6 @@ namespace HalliHax.CustomBoot
             LoadCustomBootSettingsSync();
             Initialised = true;
         }
-
 
 
         /// <summary>

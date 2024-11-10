@@ -50,7 +50,11 @@ namespace HalliHax.CustomBoot
         public void InitialiseSync()
         {
             RuntimeContainer = new GameObject($"{name}_Container");
-            DontDestroyOnLoad(RuntimeContainer);
+            if (Application.isPlaying)
+            {
+                DontDestroyOnLoad(RuntimeContainer);
+            }
+
             Instances = new GameObject[BootPrefabs.Length];
             for (var i = 0; i < BootPrefabs.Length; i++)
             {
@@ -70,12 +74,28 @@ namespace HalliHax.CustomBoot
             {
                 if (t)
                 {
-                    GameObject.Destroy(t);
+                    if (Application.isPlaying)
+                    {
+                        GameObject.Destroy(t);
+                    }
+                    else
+                    {
+                        GameObject.DestroyImmediate(t);
+                    }
+                    
                 }
             }
 
             Instances = null;
-            GameObject.Destroy(RuntimeContainer);
+
+            if (Application.isPlaying)
+            {
+                GameObject.Destroy(RuntimeContainer);
+            }
+            else
+            {
+                GameObject.DestroyImmediate(RuntimeContainer);
+            }
         }
         #endregion
     }
