@@ -1,5 +1,7 @@
 # Unity Addressables Custom Boot-Strap Example
 
+Companion article: [Bootstrapping your Unity game with Addressables](https://tomhalligan.substack.com/p/bootstrapping-your-unity-game-with)
+
 This is a demonstration project indicating how developers might use Unity's Addressables system to implement a runtime boot-strapping mechanism.
 
 This project contains a custom settings file in ProjectSettings, a custom Project Settings tab, and automatically configures the Addressables system to include a 'Runtime & Editor' and 'Editor Only' group.
